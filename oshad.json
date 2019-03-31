@@ -1,12 +1,14 @@
 {
-  "rates": [{
-    "rate":{
-      "name": "USD",
-      "purchase": "27.07",
-      "sale": "27.52"},
-    "rate":{
-      "name": "EUR",
-      "purchase": "30.05",
-      "sale": "30.95"}
-  }]
+  "rates": [
+      {
+        "name": "USD",
+        "purchase": "27.07",
+        "sale": "27.52"
+      },
+      {
+        "name": "EUR",
+        "purchase": "30.05",
+        "sale": "30.95"
+      }
+    ]
 }

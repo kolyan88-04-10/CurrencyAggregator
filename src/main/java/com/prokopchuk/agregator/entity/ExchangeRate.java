@@ -2,22 +2,22 @@ package com.prokopchuk.agregator.entity;
 
 
 public class ExchangeRate {
-    private int purchaseRate;
-    private int sellingRate;
+    private double purchaseRate;
+    private double sellingRate;
 
-    public int getPurchaseRate() {
+    public double getPurchaseRate() {
         return purchaseRate;
     }
 
-    public void setPurchaseRate(int purchaseRate) {
+    public void setPurchaseRate(double purchaseRate) {
         this.purchaseRate = purchaseRate;
     }
 
-    public int getSellingRate() {
+    public double getSellingRate() {
         return sellingRate;
     }
 
-    public void setSellingRate(int sellingRate) {
+    public void setSellingRate(double sellingRate) {
         this.sellingRate = sellingRate;
     }
 }
