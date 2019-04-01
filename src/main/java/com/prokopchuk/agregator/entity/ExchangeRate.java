@@ -1,6 +1,9 @@
 package com.prokopchuk.agregator.entity;
 
 
+import javax.persistence.*;
+
+@Embeddable
 public class ExchangeRate {
     private double purchaseRate;
     private double sellingRate;

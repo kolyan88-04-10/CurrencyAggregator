@@ -4,6 +4,8 @@ import com.google.gson.*;
 import com.prokopchuk.agregator.entity.Bank;
 import com.prokopchuk.agregator.entity.Currency;
 import com.prokopchuk.agregator.entity.ExchangeRate;
+import com.prokopchuk.agregator.service.BankService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +21,8 @@ public class CurrencyFilesUploadController {
     private List<Bank> banks;
     private static final GsonBuilder gsonBuilder = new GsonBuilder();
     private static final Gson gson = gsonBuilder.create();
+    @Autowired
+    private BankService bankService;
 
     @PostMapping
     public String fileUpload(@RequestParam("file") MultipartFile file) throws IOException {
@@ -46,6 +50,7 @@ public class CurrencyFilesUploadController {
             bankRates.put(currency, exchangeRate);
         }
         bank.setCurrencyExchangeRate(bankRates);
+        bankService.createCurrencyRate(bank);
         return "File is upload successfully";
     }
 
