@@ -5,8 +5,15 @@ import javax.persistence.*;
 
 @Embeddable
 public class ExchangeRate {
+
+    @OneToOne(cascade=CascadeType.ALL)
+    private Currency currency;
+
     private double purchaseRate;
-    private double sellingRate;
+    private double saleRate;
+
+    public ExchangeRate() {
+    }
 
     public double getPurchaseRate() {
         return purchaseRate;
@@ -16,11 +23,19 @@ public class ExchangeRate {
         this.purchaseRate = purchaseRate;
     }
 
-    public double getSellingRate() {
-        return sellingRate;
+    public double getSaleRate() {
+        return saleRate;
     }
 
-    public void setSellingRate(double sellingRate) {
-        this.sellingRate = sellingRate;
+    public void setSaleRate(double saleRate) {
+        this.saleRate = saleRate;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 }

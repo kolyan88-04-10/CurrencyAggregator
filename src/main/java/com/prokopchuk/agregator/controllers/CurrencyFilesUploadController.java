@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -35,7 +33,7 @@ public class CurrencyFilesUploadController {
         String content = new String(file.getBytes());
         JsonParser jsonParser = new JsonParser();
         JsonArray rates = jsonParser.parse(content).getAsJsonObject().getAsJsonArray("rates");
-        HashMap<Currency, ExchangeRate> bankRates = new HashMap<>();
+        List<ExchangeRate> bankRates = new ArrayList<>();
         for(JsonElement element: rates) {
             JsonObject rateObj = element.getAsJsonObject();
 
@@ -45,11 +43,12 @@ public class CurrencyFilesUploadController {
             Currency currency = new Currency();
             currency.setName(currencyCode);
             ExchangeRate exchangeRate = new ExchangeRate();
+            exchangeRate.setCurrency(currency);
             exchangeRate.setPurchaseRate(purchase);
-            exchangeRate.setSellingRate(sale);
-            bankRates.put(currency, exchangeRate);
+            exchangeRate.setSaleRate(sale);
+            bankRates.add(exchangeRate);
         }
-        bank.setCurrencyExchangeRate(bankRates);
+        bank.setRates(bankRates);
         bankService.createCurrencyRate(bank);
         return "File is upload successfully";
     }

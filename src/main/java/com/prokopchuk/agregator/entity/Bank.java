@@ -1,9 +1,7 @@
 package com.prokopchuk.agregator.entity;
 
-import org.hibernate.annotations.Cascade;
-
 import javax.persistence.*;
-import java.util.Map;
+import java.util.List;
 
 @Entity
 @Table(name = "banks")
@@ -13,12 +11,9 @@ public class Bank {
     private long id;
     private String name;
 
-//    @ElementCollection(fetch = FetchType.LAZY)
-//    @CollectionTable(name = "currency_rates",
-//    joinColumns = @JoinColumn(name="currency_Id"))
-//    @MapKeyJoinColumn(name="currency_Id")
-//    @ManyToMany(cascade = CascadeType.ALL)
-    private Map<Currency, ExchangeRate> currencyExchangeRate;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "currency_rates", joinColumns = @JoinColumn(name = "bank_Id"))
+    private List<ExchangeRate> rates;
 
     public Bank() {
     }
@@ -39,11 +34,11 @@ public class Bank {
         this.name = name;
     }
 
-    public Map<Currency, ExchangeRate> getCurrencyExchangeRate() {
-        return currencyExchangeRate;
+    public List<ExchangeRate> getRates() {
+        return rates;
     }
 
-    public void setCurrencyExchangeRate(Map<Currency, ExchangeRate> currencyExchangeRate) {
-        this.currencyExchangeRate = currencyExchangeRate;
+    public void setRates(List<ExchangeRate> rates) {
+        this.rates = rates;
     }
 }
