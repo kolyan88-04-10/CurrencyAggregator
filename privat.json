@@ -1,0 +1,19 @@
+{
+  "rates": [
+      {
+        "name": "USD",
+        "purchase": "27.0",
+        "sale": "27.3"
+      },
+      {
+        "name": "EUR",
+        "purchase": "30.25",
+        "sale": "30.8"
+      },
+    {
+      "name": "RUB",
+      "purchase": "0.39",
+      "sale": "0.42"
+    }
+    ]
+}
