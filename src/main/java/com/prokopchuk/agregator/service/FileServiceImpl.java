@@ -1,15 +1,15 @@
 package com.prokopchuk.agregator.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.prokopchuk.agregator.dto.CurrencyDTO;
 import com.prokopchuk.agregator.support.StaticMessages;
 import com.prokopchuk.agregator.support.WrongIncomingDataExeption;
-import org.json.JSONObject;
-import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,8 +59,9 @@ public class FileServiceImpl implements FileService {
                     break;
                 case XML:
                     String xml = new String(file.getBytes());
-                    JSONObject jObject = XML.toJSONObject(xml);
-                    valueList = read(new ObjectMapper(), jObject.toString());
+                    XmlMapper xmlMapper = new XmlMapper();
+                    valueList = xmlMapper.readValue(
+                            xml, new TypeReference<List<CurrencyDTO>>(){});
                     break;
                 default:
                     throw new WrongIncomingDataExeption(StaticMessages.UNKNOWN_FORMAT + format);
@@ -80,7 +81,7 @@ public class FileServiceImpl implements FileService {
     private List<CurrencyDTO> read(ObjectMapper mapper, String data) throws IOException {
         List<CurrencyDTO> result;
         mapper.registerModule(module);
-        result = mapper.readValue(data, List.class);
+        result = mapper.readValue(data, new TypeReference<List<CurrencyDTO>>(){});
         return result;
     }
 

@@ -7,7 +7,7 @@ import com.prokopchuk.agregator.entity.CurrencyTransactionType;
 import com.prokopchuk.agregator.entity.ExchangeRate;
 import com.prokopchuk.agregator.repository.BankRepository;
 import com.prokopchuk.agregator.repository.CurrencyValueRepository;
-import com.prokopchuk.agregator.repository.NationalCurrencyRepo;
+import com.prokopchuk.agregator.repository.CurrencyRepo;
 import com.prokopchuk.agregator.support.StaticMessages;
 import com.prokopchuk.agregator.support.WrongIncomingDataExeption;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class BankServiceImpl implements BankService {
             Comparator.comparing(x -> x.getChanged());
 
     @Autowired
-    private NationalCurrencyRepo nationalCurrencyRepo;
+    private CurrencyRepo currencyRepo;
     @Autowired
     private BankRepository bankRepo;
     @Autowired
@@ -42,7 +42,7 @@ public class BankServiceImpl implements BankService {
 //    //@Override
 //    public List<CurrencyDTO> getSpecificCurrency(String currencyShortName, boolean isBuying, boolean ascendByPrice) throws WrongIncomingDataExeption {
 //        List<ExchangeRate> result;
-//        Currency nationalCurrency = nationalCurrencyRepo.getByName(currencyShortName);
+//        Currency nationalCurrency = currencyRepo.getByName(currencyShortName);
 //        if (nationalCurrency==null) {
 //            String message = String.format(StaticMessages.MESSAGE_ILLEGAL_CURRENCY_NAME, currencyShortName);
 //            LOG.info(message);
@@ -61,14 +61,14 @@ public class BankServiceImpl implements BankService {
 
     @Override
     public CurrencyDTO persistCurrency(CurrencyDTO newCurrencyDTO) throws WrongIncomingDataExeption {
-        Currency currency = nationalCurrencyRepo.getByName(newCurrencyDTO.getName());
+        Currency currency = currencyRepo.getByName(newCurrencyDTO.getName());
         if (currency==null){
             Currency newOne = new Currency();
             newOne.setName(newCurrencyDTO.getName());
             newOne.setChanged(new Date());
             newOne.setDisabled(false);
-            newOne.setOrder(nationalCurrencyRepo.getLastOrder());
-            currency = nationalCurrencyRepo.save(newOne);
+            newOne.setOrder(currencyRepo.getLastOrder());
+            currency = currencyRepo.save(newOne);
         }
 
         Bank bank = bankRepo.getByName(newCurrencyDTO.getBank());
