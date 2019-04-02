@@ -10,7 +10,8 @@ import java.util.Date;
 abstract class AbstractEntity<T> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(unique = true, insertable = false, updatable = false, nullable = false, name = "id")
+    @Column(unique = true, insertable = false,
+            updatable = false, nullable = false, name = "id")
     T id;
     @Temporal(TemporalType.TIMESTAMP)
     Date changed;

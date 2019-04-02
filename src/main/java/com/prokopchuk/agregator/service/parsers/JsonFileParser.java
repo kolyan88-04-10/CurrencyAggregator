@@ -31,12 +31,12 @@ public class JsonFileParser implements FileParser {
             String currencyCode = rateObj.get("name").getAsString();
             double purchase = rateObj.get("purchase").getAsDouble();
             double sale = rateObj.get("sale").getAsDouble();
-            Currency currency = Currency.getInstance(currencyCode);
-            ExchangeRate exchangeRate = new ExchangeRate();
-            exchangeRate.setCurrency(currency);
-            exchangeRate.setPurchaseRate(purchase);
-            exchangeRate.setSaleRate(sale);
-            bankRates.add(exchangeRate);
+//            Currency currency = Currency.getInstance(currencyCode);
+//            ExchangeRate exchangeRate = new ExchangeRate();
+//            exchangeRate.setCurrency(currency);
+//            exchangeRate.setPurchaseRate(purchase);
+//            exchangeRate.setSaleRate(sale);
+//            bankRates.add(exchangeRate);
         }
         bank.setRates(bankRates);
         return bank;

@@ -3,18 +3,21 @@ package com.prokopchuk.agregator.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import java.math.BigDecimal;
 
-@EqualsAndHashCode(callSuper = true, exclude = {"type", "bank"})
+@EqualsAndHashCode(callSuper = true, exclude = {"currency", "bank"})
 @JsonIgnoreProperties(ignoreUnknown=true)
 @Entity
-public class ExchangeRate extends AbstractEntity {
+@Getter @Setter
+public class ExchangeRate extends AbstractEntity<Integer> {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "type_id")
-    private Currency type;
+    @JoinColumn(name = "currency_id")
+    private Currency currency;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "bank_id")
@@ -22,6 +25,8 @@ public class ExchangeRate extends AbstractEntity {
     @Digits(integer=7, fraction=2)
     private BigDecimal value;
     @Enumerated(EnumType.STRING)
-    private CurrencyTransactionType sellingValue;
+    private CurrencyTransactionType transactionType;
     private Boolean operationAllowed;
+
+
 }
