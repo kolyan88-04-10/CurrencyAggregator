@@ -1,29 +1,24 @@
 package com.prokopchuk.agregator.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
+
 import javax.persistence.*;
+import javax.persistence.Entity;
+import java.util.ArrayList;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
+@EqualsAndHashCode(callSuper = true, exclude = "currencyValueList")
 @Entity
-@Table(name = "banks")
-public class Bank {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+public class Bank extends AbstractEntity<Integer> {
     private String name;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "currency_rates", joinColumns = @JoinColumn(name = "bank_Id"))
-    private List<ExchangeRate> rates;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,
+            mappedBy = "bank")
+    private List<ExchangeRate> rates = new ArrayList<>();
 
     public Bank() {
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {
