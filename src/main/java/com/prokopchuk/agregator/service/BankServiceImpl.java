@@ -5,8 +5,8 @@ import com.prokopchuk.agregator.entity.Bank;
 import com.prokopchuk.agregator.entity.Currency;
 import com.prokopchuk.agregator.entity.CurrencyTransactionType;
 import com.prokopchuk.agregator.entity.ExchangeRate;
-import com.prokopchuk.agregator.repository.BankRepository;
-import com.prokopchuk.agregator.repository.CurrencyValueRepository;
+import com.prokopchuk.agregator.repository.BankRepo;
+import com.prokopchuk.agregator.repository.ExchangeRateRepo;
 import com.prokopchuk.agregator.repository.CurrencyRepo;
 import com.prokopchuk.agregator.support.StaticMessages;
 import com.prokopchuk.agregator.support.WrongIncomingDataExeption;
@@ -16,10 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BankServiceImpl implements BankService {
@@ -31,33 +29,101 @@ public class BankServiceImpl implements BankService {
     @Autowired
     private CurrencyRepo currencyRepo;
     @Autowired
-    private BankRepository bankRepo;
+    private BankRepo bankRepo;
     @Autowired
-    private CurrencyValueRepository currencyValueRepository;
+    private ExchangeRateRepo exchangeRateRepo;
 
-    public BankServiceImpl(BankRepository bankRepo) {
-        this.bankRepo = bankRepo;
+    @Override
+    public List<CurrencyDTO> getAllExchangeRates() {
+        List<ExchangeRate> exchangeRates = exchangeRateRepo.getByDisabled(false);
+        List<CurrencyDTO> currencyDTOs = new ArrayList<>();
+        exchangeRates.stream().forEach(er ->currencyDTOs.add(new CurrencyDTO(er)));
+        return currencyDTOs;
     }
 
-//    //@Override
-//    public List<CurrencyDTO> getSpecificCurrency(String currencyShortName, boolean isBuying, boolean ascendByPrice) throws WrongIncomingDataExeption {
-//        List<ExchangeRate> result;
-//        Currency nationalCurrency = currencyRepo.getByName(currencyShortName);
-//        if (nationalCurrency==null) {
-//            String message = String.format(StaticMessages.MESSAGE_ILLEGAL_CURRENCY_NAME, currencyShortName);
-//            LOG.info(message);
-//            throw new WrongIncomingDataExeption(message);
-//        }
-//        CurrencyTransactionType transactionType = isBuying ? CurrencyTransactionType.BUYING : CurrencyTransactionType.SELLING;
-//
-//        if (ascendByPrice) {
-//            result = currencyValueRepository.getByTypeAndSellingValueAndDisabledAndOperationAllowedOrderByValueAsc(nationalCurrency, transactionType, false, true);
-//        } else {
-//            result = currencyValueRepository.getByTypeAndSellingValueAndDisabledAndOperationAllowedOrderByValueDesc(nationalCurrency, transactionType, false, true);
-//        }
-//
-//        return result.stream().map(this::convert).collect(Collectors.toList());
-//    }
+    @Override
+    public List<CurrencyDTO> getSpecificCurrency(
+            String currencyShortName, boolean isBuying, boolean ascendByPrice)
+            throws WrongIncomingDataExeption {
+        List<ExchangeRate> result;
+        Currency currency = currencyRepo.getByName(currencyShortName);
+        if (currency==null) {
+            String message = String.format(
+                    StaticMessages.MESSAGE_ILLEGAL_CURRENCY_NAME, currencyShortName);
+            LOG.info(message);
+            throw new WrongIncomingDataExeption(message);
+        }
+        CurrencyTransactionType transactionType = isBuying
+                ? CurrencyTransactionType.BUYING : CurrencyTransactionType.SELLING;
+
+        if (ascendByPrice) {
+            result = exchangeRateRepo
+                    .getByCurrencyAndTransactionTypeAndDisabledAndOperationAllowedOrderByValueAsc(
+                            currency, transactionType, false, true);
+        } else {
+            result = exchangeRateRepo
+                    .getByCurrencyAndTransactionTypeAndDisabledAndOperationAllowedOrderByValueDesc(
+                            currency, transactionType, false, true);
+        }
+
+        return result.stream().map(this::convert).collect(Collectors.toList());
+    }
+
+    @Override
+    public CurrencyDTO removeCurrency(String bankName, String currency) {
+        return null;
+    }
+
+    @Override
+    public List<CurrencyDTO> changeSpecificCurrencyAllowanceByBank(
+            String bankName, String name, String requestTransactionType,
+            Boolean allow, boolean delete) throws WrongIncomingDataExeption {
+        Bank bank = bankRepo.getByName(bankName);
+        if (bank==null){
+            throw new WrongIncomingDataExeption("Can't find bank with name: " + bankName);
+        }
+
+        Currency currency = currencyRepo.getByName(name);
+
+        CurrencyTransactionType transactionType = null;
+
+        if (requestTransactionType!=null) {
+            try {
+                transactionType = CurrencyTransactionType.valueOf(requestTransactionType);
+            } catch (IllegalArgumentException e) {
+                throw new WrongIncomingDataExeption("Unknown action: " + requestTransactionType);
+            }
+        }
+        List<ExchangeRate> toProcessList;
+        if (currency!=null){
+            if (transactionType!=null){
+                toProcessList = exchangeRateRepo
+                        .getByCurrencyAndBankAndTransactionTypeAndDisabled(
+                                currency, bank, transactionType, false);
+            } else {
+                toProcessList = exchangeRateRepo
+                        .getByCurrencyAndBankAndDisabled(currency, bank, false);
+            }
+        } else {
+            if (transactionType!=null){
+                toProcessList = exchangeRateRepo
+                        .getByBankAndTransactionTypeAndDisabled(
+                                bank, transactionType, false);
+            } else {
+                toProcessList = exchangeRateRepo.getByBankAndDisabled(
+                        bank, false);
+            }
+        }
+        if (delete) {
+            toProcessList.stream().filter(x-> !x.getDisabled()).forEach(x->x.setDisabled(true));
+        } else if (allow!=null && allow) {
+            toProcessList.stream().filter(x-> !x.getOperationAllowed()).forEach(x->x.setOperationAllowed(true));
+        } else if (allow!=null && !allow) {
+            toProcessList.stream().filter(ExchangeRate::getOperationAllowed).forEach(x->x.setOperationAllowed(false));
+        }
+        exchangeRateRepo.saveAll(toProcessList);
+        return toProcessList.stream().map(this::convert).collect(Collectors.toList());
+    }
 
     @Override
     public CurrencyDTO persistCurrency(CurrencyDTO newCurrencyDTO) throws WrongIncomingDataExeption {
@@ -91,7 +157,7 @@ public class BankServiceImpl implements BankService {
 
         BigDecimal value;
         if (newCurrencyDTO.getValue()==null || newCurrencyDTO.getValue().isEmpty()) {
-            Optional<ExchangeRate> valueOptional = currencyValueRepository
+            Optional<ExchangeRate> valueOptional = exchangeRateRepo
                     .getByCurrencyAndBankAndTransactionTypeAndDisabledAndOperationAllowed(
                             currency, bank, transactionType, false, true).stream().min(dateComparator);
             if (valueOptional.isPresent()){
@@ -106,7 +172,7 @@ public class BankServiceImpl implements BankService {
         }
 
         try {
-            List<ExchangeRate> previousList = currencyValueRepository.getByCurrencyAndBankAndTransactionTypeAndDisabled(currency, bank, transactionType, false);
+            List<ExchangeRate> previousList = exchangeRateRepo.getByCurrencyAndBankAndTransactionTypeAndDisabled(currency, bank, transactionType, false);
 
             for (ExchangeRate currentPrevious : previousList) {
                 currentPrevious.setDisabled(true);
@@ -125,8 +191,7 @@ public class BankServiceImpl implements BankService {
             toPersist.setValue(value);
             toPersist.setChanged(new Date());
 
-            //historyService.persistHistory(null, toPersist);
-            ExchangeRate result = currencyValueRepository.save(toPersist);
+            ExchangeRate result = exchangeRateRepo.save(toPersist);
             return convert(result);
 
         } catch (RuntimeException e) {
@@ -136,20 +201,10 @@ public class BankServiceImpl implements BankService {
         }
     }
 
+
+
     private CurrencyDTO convert(ExchangeRate exchangeRate) {
         return new CurrencyDTO(exchangeRate);
     }
 
-//    @Transactional
-//    //@Override
-//    public void persistCurrencyList(List<ExchangeRate> valueList) {
-//        LOG.info("Saving list to the database");
-//
-//        currencyValueRepository.saveAll(valueList);
-//    }
-
-    @Override
-    public List<Bank> getCurrencysRates() {
-        return bankRepo.findAll();
-    }
 }

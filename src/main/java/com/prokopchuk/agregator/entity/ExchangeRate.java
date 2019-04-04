@@ -1,6 +1,7 @@
 package com.prokopchuk.agregator.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,10 +16,13 @@ import java.math.BigDecimal;
 @Entity
 @Getter @Setter
 public class ExchangeRate extends AbstractEntity<Integer> {
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "currency_id")
     private Currency currency;
 
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "bank_id")
     private Bank bank;

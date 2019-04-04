@@ -1,0 +1,39 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Currency rates</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1> Currency rates </h1>
+        </div>
+    </div>
+    <div class="col-md-6">
+    <a class="btn btn-success" href="#" th:href="@{/edit-rates.html}"> Add Books </a>
+    <a class="btn btn-primary" href="#" th:href="@{/delete-rates.html}" th:classappend="${rates.empty} ? 'disabled' : ''"> Edit Books </a>
+    </div>
+    <form action="#" th:action="@{/CurrencyAggregator/create}" th:object="${form}" method="post">
+        <p>Currency: <input type="text" th:field="*{name}" /></p>
+        <p>Bank: <input type="text" th:field="*{bank}" /></p>
+        <p>Rate: <input type="text" th:field="*{value}" /></p>
+        <p>Transaction type:
+            <select th:field="*{transactionType}">
+            <option th:value="BUYING" th:text="BUYING"></option>
+            <option th:value="SELLING" th:text="SELLING"></option>
+            </select>
+        </p>
+        <p>Operation allowed:
+            <select th:field="*{allowed}">
+                <option th:value="true" th:text="Allowed"></option>
+                <option th:value="false" th:text="NotAllowed"></option>
+            </select>
+        </p>
+        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+    </form>
+
+    </div>
+</div>
+</body>
+</html>
