@@ -12,7 +12,9 @@
     </div>
     <div class="col-md-6">
     <a class="btn btn-success" href="#" th:href="@{/edit-rates.html}"> Add Books </a>
-    <a class="btn btn-primary" href="#" th:href="@{/delete-rates.html}" th:classappend="${rates.empty} ? 'disabled' : ''"> Edit Books </a>
+    <a class="btn btn-primary" href="#" th:href="@{/delete-rates.html}" th:classappend="${rates.empty} ? 'disabled' : ''">
+        Edit currency rates
+    </a>
     </div>
     <form action="#" th:action="@{/CurrencyAggregator/create}" th:object="${form}" method="post">
         <p>Currency: <input type="text" th:field="*{name}" /></p>

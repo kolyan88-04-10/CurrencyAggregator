@@ -1,6 +1,7 @@
 package com.prokopchuk.agregator.controllers;
 
 import com.prokopchuk.agregator.dto.CurrencyDTO;
+import com.prokopchuk.agregator.dto.SelectCurrencyDTO;
 import com.prokopchuk.agregator.entity.Currency;
 import com.prokopchuk.agregator.entity.ExchangeRate;
 import com.prokopchuk.agregator.service.BankService;
@@ -79,11 +80,11 @@ public class ExchangeRatesController {
 //    }
 
     @GetMapping("CurrencyAggregator/create")
-    public String showCreateForm(Model model) {
-        List<CurrencyDTO> parameters = bankService.getAllExchangeRates();
+    public String showCreateCurrencyForm(Model model) {
+        List<CurrencyDTO> rates = bankService.getAllExchangeRates();
         CurrencyDTO currencyForm = new CurrencyDTO();
         model.addAttribute("form", currencyForm);
-        model.addAttribute("rates", bankService.getAllExchangeRates());
+        model.addAttribute("rates", rates);
         return "edit-rates";
     }
 
@@ -97,13 +98,28 @@ public class ExchangeRatesController {
         return "view-all-rates";
     }
 
-
-
-    @DeleteMapping(path = "/{bankName}/currency")
-    public ResponseEntity<Void> deleteUser(@PathVariable String bankName,
-                                           @PathVariable String currency){
-        bankService.removeCurrency(bankName, currency);
-        return ResponseEntity.noContent().build();
+    @GetMapping("CurrencyAggregator/select")
+    public String showSelectCurrencyForm(Model model) {
+        List<CurrencyDTO> rates = bankService.getAllExchangeRates();
+        SelectCurrencyDTO currencyForm = new SelectCurrencyDTO();
+        model.addAttribute("form", currencyForm);
+        model.addAttribute("rates", rates);
+        return "select-currency";
     }
 
+    @PostMapping("/CurrencyAggregator/show")
+    public String showSpecifiedCurrency (Model model,
+                                         @ModelAttribute SelectCurrencyDTO selectCurrencyDTO) {
+        try {
+            String currencyName = selectCurrencyDTO.getName();
+            boolean isBuying = selectCurrencyDTO.getIsBuying();
+            boolean isAscending = selectCurrencyDTO.getIsAscending();
+            List<CurrencyDTO> resultList =  bankService.getSpecificCurrency(
+                    currencyName, isBuying, isAscending);
+            model.addAttribute("rates", resultList);
+        } catch (WrongIncomingDataExeption wrongIncomingDataExeption) {
+            return "error-page";
+        }
+        return "view-rates";
+    }
 }
