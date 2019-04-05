@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.prokopchuk.agregator.dto.CurrencyDTO;
+import com.prokopchuk.agregator.exception.WrongIncomingDataException;
 import com.prokopchuk.agregator.support.StaticMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

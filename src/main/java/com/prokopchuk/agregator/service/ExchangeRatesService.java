@@ -15,9 +15,6 @@ public interface ExchangeRatesService {
             throws WrongIncomingDataException;
     List<CurrencyDTO> getSpecificCurrency(String currencyShortName,
                                           boolean isBuying, boolean ascendByPrice) throws WrongIncomingDataException;
-    List<CurrencyDTO> editCurrencyRateByBank(
-            String bankName, String shortName, String action, Boolean allow, boolean delete)
-            throws WrongIncomingDataException;
 
     List<CurrencyDTO> getAllExchangeRates();
 

@@ -5,6 +5,7 @@ import com.prokopchuk.agregator.entity.Bank;
 import com.prokopchuk.agregator.entity.Currency;
 import com.prokopchuk.agregator.entity.CurrencyTransactionType;
 import com.prokopchuk.agregator.entity.ExchangeRate;
+import com.prokopchuk.agregator.exception.WrongIncomingDataException;
 import com.prokopchuk.agregator.repository.ExchangeRateRepo;
 import com.prokopchuk.agregator.support.StaticMessages;
 import org.slf4j.Logger;
@@ -82,56 +83,6 @@ public class ExchangeRatesServiceImpl implements ExchangeRatesService {
         List<CurrencyDTO> currencyDTOs = new ArrayList<>();
         exchangeRates.stream().forEach(exchangeRate -> currencyDTOs.add(convert(exchangeRate)));
         return currencyDTOs;
-    }
-
-    @Override
-    public List<CurrencyDTO> editCurrencyRateByBank(
-            String bankName, String name, String requestTransactionType,
-            Boolean allow, boolean delete) throws WrongIncomingDataException {
-        Bank bank = bankService.getByName(bankName);
-        if (bank==null){
-            throw new WrongIncomingDataException("Can't find bank with name: " + bankName);
-        }
-        Currency currency = currencyService.getByName(name);
-
-        CurrencyTransactionType transactionType = null;
-
-        if (requestTransactionType!=null) {
-            try {
-                transactionType = CurrencyTransactionType.valueOf(requestTransactionType);
-            } catch (IllegalArgumentException e) {
-                throw new WrongIncomingDataException("Unknown action: " + requestTransactionType);
-            }
-        }
-        List<ExchangeRate> toProcessList;
-        if (currency!=null){
-            if (transactionType!=null){
-                toProcessList = exchangeRateRepo
-                        .getByCurrencyAndBankAndTransactionTypeAndDisabled(
-                                currency, bank, transactionType, false);
-            } else {
-                toProcessList = exchangeRateRepo
-                        .getByCurrencyAndBankAndDisabled(currency, bank, false);
-            }
-        } else {
-            if (transactionType!=null){
-                toProcessList = exchangeRateRepo
-                        .getByBankAndTransactionTypeAndDisabled(
-                                bank, transactionType, false);
-            } else {
-                toProcessList = exchangeRateRepo.getByBankAndDisabled(
-                        bank, false);
-            }
-        }
-        if (allow!=null && allow) {
-            toProcessList.stream().filter(x-> !x.getOperationAllowed()).forEach(
-                    x->x.setOperationAllowed(true));
-        } else if (allow!=null && !allow) {
-            toProcessList.stream().filter(ExchangeRate::getOperationAllowed).forEach(
-                    x->x.setOperationAllowed(false));
-        }
-        exchangeRateRepo.saveAll(toProcessList);
-        return toProcessList.stream().map(this::convert).collect(Collectors.toList());
     }
 
     @Override

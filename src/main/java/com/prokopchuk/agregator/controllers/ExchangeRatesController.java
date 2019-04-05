@@ -31,6 +31,11 @@ public class ExchangeRatesController {
     @Autowired
     private CurrencyService currencyService;
 
+    @GetMapping(path = "CurrencyAggregator/start")
+    public String startApplication() {
+        return "index";
+    }
+
     @CacheResult(cacheName = "values")
     @GetMapping(path = "CurrencyAggregator/all")
     public String getAllCurrencyRates(Model model){
