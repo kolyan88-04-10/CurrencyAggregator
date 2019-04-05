@@ -1,7 +1,7 @@
 package com.prokopchuk.agregator.service;
 
 import com.prokopchuk.agregator.dto.CurrencyDTO;
-import com.prokopchuk.agregator.support.WrongIncomingDataException;
+import com.prokopchuk.agregator.exception.WrongIncomingDataException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

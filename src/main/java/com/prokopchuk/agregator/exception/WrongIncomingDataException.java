@@ -1,4 +1,4 @@
-package com.prokopchuk.agregator.support;
+package com.prokopchuk.agregator.exception;
 
 public class WrongIncomingDataException extends Exception {
 

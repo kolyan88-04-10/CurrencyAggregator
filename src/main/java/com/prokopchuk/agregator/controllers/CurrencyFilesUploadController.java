@@ -1,8 +1,8 @@
 package com.prokopchuk.agregator.controllers;
 
 import com.prokopchuk.agregator.dto.CurrencyDTO;
+import com.prokopchuk.agregator.exception.WrongIncomingDataException;
 import com.prokopchuk.agregator.service.FileService;
-import com.prokopchuk.agregator.support.WrongIncomingDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
