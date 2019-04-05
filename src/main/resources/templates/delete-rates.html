@@ -11,8 +11,15 @@
         </div>
     </div>
     <div class="col-md-6">
-    <a class="btn btn-success" href="#" th:href="@{/edit-rates.html}"> Add Books </a>
-    <a class="btn btn-primary" href="#" th:href="@{/templates/delete-rate.html}" th:classappend="${rates.empty} ? 'disabled' : ''"> Edit Books </a>
+        <a class="btn btn-success" href="#" th:href="@{/CurrencyAggregator/all}">
+            All currencies
+        </a>
+        <a class="btn btn-success" href="#" th:href="@{/CurrencyAggregator/select}">
+            Select currency
+        </a>
+        <a class="btn btn-success" href="#" th:href="@{/CurrencyAggregator/create}">
+            Edit rates
+        </a>
     </div>
     <form action="#" th:action="@{/CurrencyAggregator/delete}" th:object="${form}" th:method="delete">
         <p>Currency:

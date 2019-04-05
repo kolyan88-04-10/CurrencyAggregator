@@ -3,8 +3,15 @@ package com.prokopchuk.agregator.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * Root of all entities which have identifier field.
+ * @param <T>
+ *
+ * @author N. Prokopchuk
+ */
 @JsonIgnoreProperties(ignoreUnknown=true)
 @MappedSuperclass
 abstract class AbstractEntity<T> {

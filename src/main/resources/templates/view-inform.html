@@ -7,7 +7,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1> Welcome to currency rates aggregator </h1>
+            <h1> Currency rates </h1>
         </div>
     </div>
 
@@ -22,6 +22,12 @@
             Edit rates
         </a>
     <a class="btn btn-primary" href="#" th:href="@{/CurrencyAggregator/delete}" th:classappend="${rates.empty} ? 'disabled' : ''"> Delete rates </a>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <p th:text="${message}">Welcome to currency rates Aggregator!</p>
+        </div>
+
     </div>
 </div>
 </body>

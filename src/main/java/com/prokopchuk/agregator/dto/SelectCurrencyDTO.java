@@ -4,6 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * DTO used in ExchangeRatesController as
+ * form to select specified currency and sort order
+ *
+ * @author N.Prokopchuk
+ */
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter

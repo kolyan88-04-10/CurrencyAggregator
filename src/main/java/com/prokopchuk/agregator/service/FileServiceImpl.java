@@ -9,22 +9,24 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.prokopchuk.agregator.dto.CurrencyDTO;
 import com.prokopchuk.agregator.support.StaticMessages;
-import com.prokopchuk.agregator.support.WrongIncomingDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Service to upload files with currency rates in application
+ *
+ * @author N.Prokopchuk
+ */
 @Service
 public class FileServiceImpl implements FileService {
 
     private final SimpleModule module = new SimpleModule();
     private final CsvSchema schema = CsvSchema.emptySchema().withHeader();
     @Autowired
-    private ExchengeRatesService exchengeRatesService;
+    private ExchangeRatesService exchangeRatesService;
 
     private enum Extension {CSV, JSON, XML}
 
@@ -73,7 +75,7 @@ public class FileServiceImpl implements FileService {
         List<CurrencyDTO> result = new ArrayList<>();
         for (CurrencyDTO current : valueList) {
             current.setBank(bankName);
-            result.add(exchengeRatesService.persistCurrency(current));
+            result.add(exchangeRatesService.persistCurrency(current));
         }
         return result;
     }

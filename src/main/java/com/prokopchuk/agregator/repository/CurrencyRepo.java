@@ -4,6 +4,11 @@ import com.prokopchuk.agregator.entity.Currency;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+/**
+ * Currency repository
+ *
+ * @author N.Prokopchuk
+ */
 public interface CurrencyRepo extends JpaRepository<Currency, Integer> {
    Currency getByName(String name);
 

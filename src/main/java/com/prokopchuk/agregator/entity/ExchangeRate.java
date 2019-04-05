@@ -6,10 +6,18 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-
 import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import java.math.BigDecimal;
+
+/**
+ * ExchangeRate entity
+ *
+ * Entity which allows you to link the bank and the currency
+ * many to many relationship
+ *
+ * @author N.Prokopchuk
+ */
 
 @EqualsAndHashCode(callSuper = true, exclude = {"currency", "bank"})
 @JsonIgnoreProperties(ignoreUnknown=true)

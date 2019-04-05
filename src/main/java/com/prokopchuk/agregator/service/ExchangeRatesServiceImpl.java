@@ -5,11 +5,8 @@ import com.prokopchuk.agregator.entity.Bank;
 import com.prokopchuk.agregator.entity.Currency;
 import com.prokopchuk.agregator.entity.CurrencyTransactionType;
 import com.prokopchuk.agregator.entity.ExchangeRate;
-import com.prokopchuk.agregator.repository.BankRepo;
 import com.prokopchuk.agregator.repository.ExchangeRateRepo;
-import com.prokopchuk.agregator.repository.CurrencyRepo;
 import com.prokopchuk.agregator.support.StaticMessages;
-import com.prokopchuk.agregator.support.WrongIncomingDataException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +16,24 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service to to work with ExchangeRates entities
+ *
+ * @author N.Prokopchuk
+ */
 @Service
-public class ExchengeRatesServiceImpl implements ExchengeRatesService {
+public class ExchangeRatesServiceImpl implements ExchangeRatesService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExchengeRatesServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExchangeRatesServiceImpl.class);
     private static final Comparator<ExchangeRate> dateComparator =
             Comparator.comparing(x -> x.getChanged());
-
-    @Autowired
-    private CurrencyRepo currencyRepo;
-    @Autowired
-    private BankRepo bankRepo;
     @Autowired
     private ExchangeRateRepo exchangeRateRepo;
+
+    @Autowired
+    private CurrencyService currencyService;
+    @Autowired
+    private BankService bankService;
 
     @Override
     public List<CurrencyDTO> getAllExchangeRates() {
@@ -43,13 +45,13 @@ public class ExchengeRatesServiceImpl implements ExchengeRatesService {
 
     @Override
     public List<CurrencyDTO> getSpecificCurrency(
-            String currencyShortName, boolean isBuying, boolean ascendByPrice)
+            String currencyName, boolean isBuying, boolean ascendByPrice)
             throws WrongIncomingDataException {
         List<ExchangeRate> result;
-        Currency currency = currencyRepo.getByName(currencyShortName);
+        Currency currency = currencyService.getByName(currencyName);
         if (currency==null) {
             String message = String.format(
-                    StaticMessages.MESSAGE_ILLEGAL_CURRENCY_NAME, currencyShortName);
+                    StaticMessages.MESSAGE_ILLEGAL_CURRENCY_NAME, currencyName);
             LOG.info(message);
             throw new WrongIncomingDataException(message);
         }
@@ -71,8 +73,8 @@ public class ExchengeRatesServiceImpl implements ExchengeRatesService {
 
     @Override
     public List<CurrencyDTO> removeCurrency(String bankName, String currencyName) {
-        Bank bank = bankRepo.getByName(bankName);
-        Currency currency = currencyRepo.getByName(currencyName);
+        Bank bank = bankService.getByName(bankName);
+        Currency currency = currencyService.getByName(currencyName);
         List<ExchangeRate> exchangeRates = exchangeRateRepo.getByBankAndCurrencyAndDisabled(
                 bank, currency, false);
         exchangeRates.stream().filter(x-> !x.getDisabled()).forEach(x->x.setDisabled(true));
@@ -83,14 +85,14 @@ public class ExchengeRatesServiceImpl implements ExchengeRatesService {
     }
 
     @Override
-    public List<CurrencyDTO> changeSpecificCurrencyAllowanceByBank(
+    public List<CurrencyDTO> editCurrencyRateByBank(
             String bankName, String name, String requestTransactionType,
             Boolean allow, boolean delete) throws WrongIncomingDataException {
-        Bank bank = bankRepo.getByName(bankName);
+        Bank bank = bankService.getByName(bankName);
         if (bank==null){
             throw new WrongIncomingDataException("Can't find bank with name: " + bankName);
         }
-        Currency currency = currencyRepo.getByName(name);
+        Currency currency = currencyService.getByName(name);
 
         CurrencyTransactionType transactionType = null;
 
@@ -121,9 +123,7 @@ public class ExchengeRatesServiceImpl implements ExchengeRatesService {
                         bank, false);
             }
         }
-        if (delete) {
-            toProcessList.stream().filter(x-> !x.getDisabled()).forEach(x->x.setDisabled(true));
-        } else if (allow!=null && allow) {
+        if (allow!=null && allow) {
             toProcessList.stream().filter(x-> !x.getOperationAllowed()).forEach(
                     x->x.setOperationAllowed(true));
         } else if (allow!=null && !allow) {
@@ -136,23 +136,23 @@ public class ExchengeRatesServiceImpl implements ExchengeRatesService {
 
     @Override
     public CurrencyDTO persistCurrency(CurrencyDTO newCurrencyDTO) throws WrongIncomingDataException {
-        Currency currency = currencyRepo.getByName(newCurrencyDTO.getName());
+        Currency currency = currencyService.getByName(newCurrencyDTO.getName());
         if (currency==null){
             Currency newOne = new Currency();
             newOne.setName(newCurrencyDTO.getName());
             newOne.setChanged(new Date());
             newOne.setDisabled(false);
-            newOne.setOrder(currencyRepo.getLastOrder());
-            currency = currencyRepo.save(newOne);
+            newOne.setOrder(currencyService.getLastOrder());
+            currency = currencyService.save(newOne);
         }
 
-        Bank bank = bankRepo.getByName(newCurrencyDTO.getBank());
+        Bank bank = bankService.getByName(newCurrencyDTO.getBank());
         if (bank==null){
             Bank newBank = new Bank();
             newBank.setName(newCurrencyDTO.getBank());
             newBank.setChanged(new Date());
             newBank.setDisabled(false);
-            bank = bankRepo.save(newBank);
+            bank = bankService.save(newBank);
         }
 
         CurrencyTransactionType transactionType;
@@ -198,11 +198,10 @@ public class ExchengeRatesServiceImpl implements ExchengeRatesService {
             toPersist.setTransactionType(transactionType);
             toPersist.setCurrency(currency);
             toPersist.setValue(value);
+            toPersist.setOperationAllowed(newCurrencyDTO.getAllowed());
             toPersist.setChanged(new Date());
-
             ExchangeRate result = exchangeRateRepo.save(toPersist);
             return convert(result);
-
         } catch (RuntimeException e) {
             String message = String.format(StaticMessages.MESSAGE_ILLEGAL_CURRENCY_CREATION, newCurrencyDTO);
             LOG.warn(message, e);

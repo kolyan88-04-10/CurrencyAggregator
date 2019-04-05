@@ -6,20 +6,26 @@ import com.prokopchuk.agregator.entity.Bank;
 import com.prokopchuk.agregator.entity.Currency;
 import com.prokopchuk.agregator.service.BankService;
 import com.prokopchuk.agregator.service.CurrencyService;
-import com.prokopchuk.agregator.service.ExchengeRatesService;
+import com.prokopchuk.agregator.service.ExchangeRatesService;
+import com.prokopchuk.agregator.support.StaticMessages;
 import com.prokopchuk.agregator.support.WrongIncomingDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import javax.cache.annotation.CacheResult;
 import java.util.List;
+
+/**
+ * Controller to show, select, add and edit currency rates in application
+ *
+ * @author N.Prokopchuk
+ */
 
 @Controller("CurrencyAggregator/rates")
 public class ExchangeRatesController {
     @Autowired
-    private ExchengeRatesService exchengeRatesService;
+    private ExchangeRatesService exchangeRatesService;
     @Autowired
     private BankService bankService;
     @Autowired
@@ -29,33 +35,13 @@ public class ExchangeRatesController {
     @GetMapping(path = "CurrencyAggregator/all")
     public String getAllCurrencyRates(Model model){
             model.addAttribute("rates",
-                    exchengeRatesService.getAllExchangeRates());
+                    exchangeRatesService.getAllExchangeRates());
             return "view-all-rates";
     }
 
-//    @CacheRemoveAll(cacheName = "values")
-//    @PutMapping(consumes={MediaType.APPLICATION_JSON_UTF8_VALUE},
-//            produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
-//    public ResponseEntity changeCurrencyAvailability(@RequestBody CurrencyDTO incoming,
-//                                                     @RequestParam(value="delete", required = false) Boolean delete){
-//        String bankName = incoming.getBank();
-//        String currencyName = incoming.getName();
-//        String action = incoming.getTransactionType();
-//        Boolean allow = incoming.getAllowed();
-//        if (allow == null && (delete == null || !delete)){
-//            return new ResponseEntity<>(StaticMessages.NO_FLAGS, HttpStatus.BAD_REQUEST);
-//        }
-//        try {
-//            return new ResponseEntity<>(exchengeRatesService.changeSpecificCurrencyAllowanceByBank(
-//                    bankName, currencyName, action, allow, delete), HttpStatus.OK);
-//        } catch (WrongIncomingDataException e) {
-//            return new ResponseEntity<>(e.getLocalizedMessage(), HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
     @GetMapping("CurrencyAggregator/create")
     public String showCreateCurrencyForm(Model model) {
-        List<CurrencyDTO> rates = exchengeRatesService.getAllExchangeRates();
+        List<CurrencyDTO> rates = exchangeRatesService.getAllExchangeRates();
         CurrencyDTO currencyForm = new CurrencyDTO();
         model.addAttribute("form", currencyForm);
         model.addAttribute("rates", rates);
@@ -63,18 +49,23 @@ public class ExchangeRatesController {
     }
 
     @PostMapping("/CurrencyAggregator/create")
-    public String saveCurrency (@ModelAttribute CurrencyDTO currencyDTO) {
+    public String saveCurrency (Model model,
+                                @ModelAttribute CurrencyDTO currencyDTO) {
+
         try {
-            exchengeRatesService.persistCurrency(currencyDTO);
+            exchangeRatesService.persistCurrency(currencyDTO);
         } catch (WrongIncomingDataException wrongIncomingDataException) {
             return "error-page";
         }
-        return "view-all-rates";
+        List<CurrencyDTO> rates = exchangeRatesService.getAllExchangeRates();
+        model.addAttribute("rates", rates);
+        model.addAttribute("message", StaticMessages.EXCHANGE_RATE_MODIFIED_MESSAGE);
+        return "view-inform";
     }
 
     @GetMapping("CurrencyAggregator/delete")
     public String showDeleteCurrencyForm(Model model) {
-        List<CurrencyDTO> rates = exchengeRatesService.getAllExchangeRates();
+        List<CurrencyDTO> rates = exchangeRatesService.getAllExchangeRates();
         List<Currency> currencies = currencyService.getAllCurrencies();
         List<Bank> banks = bankService.getAllBanks();
         CurrencyDTO currencyForm = new CurrencyDTO();
@@ -82,19 +73,22 @@ public class ExchangeRatesController {
         model.addAttribute("rates", rates);
         model.addAttribute("currencies", currencies);
         model.addAttribute("banks", banks);
-        return "delete-rate";
+        return "delete-rates";
     }
 
     @DeleteMapping("/CurrencyAggregator/delete")
-    public String deleteCurrency (
+    public String deleteCurrency (Model model,
             @ModelAttribute CurrencyDTO currencyDTO) {
-        exchengeRatesService.removeCurrency(currencyDTO.getBank(), currencyDTO.getName());
-        return "view-all-rates";
+        exchangeRatesService.removeCurrency(currencyDTO.getBank(), currencyDTO.getName());
+        List<CurrencyDTO> rates = exchangeRatesService.getAllExchangeRates();
+        model.addAttribute("rates", rates);
+        model.addAttribute("message", StaticMessages.EXCHANGE_RATE_DELETED_MESSAGE);
+        return "view-inform";
     }
 
     @GetMapping("CurrencyAggregator/select")
     public String showSelectCurrencyForm(Model model) {
-        List<CurrencyDTO> rates = exchengeRatesService.getAllExchangeRates();
+        List<CurrencyDTO> rates = exchangeRatesService.getAllExchangeRates();
         List<Currency> allCurrencies = currencyService.getAllCurrencies();
         SelectCurrencyDTO currencyForm = new SelectCurrencyDTO();
         model.addAttribute("form", currencyForm);
@@ -110,7 +104,7 @@ public class ExchangeRatesController {
             String currencyName = selectCurrencyDTO.getName();
             boolean isBuying = selectCurrencyDTO.getIsBuying();
             boolean isAscending = selectCurrencyDTO.getIsAscending();
-            List<CurrencyDTO> resultList =  exchengeRatesService.getSpecificCurrency(
+            List<CurrencyDTO> resultList =  exchangeRatesService.getSpecificCurrency(
                     currencyName, isBuying, isAscending);
             model.addAttribute("rates", resultList);
         } catch (WrongIncomingDataException wrongIncomingDataException) {

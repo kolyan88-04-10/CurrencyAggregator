@@ -5,7 +5,11 @@ import com.prokopchuk.agregator.entity.ExchangeRate;
 import lombok.Getter;
 import lombok.Setter;
 
-
+/**
+ * Main DTO used for data transfer in application
+ *
+ * @author N.Prokopchuk
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter @Setter
 public class CurrencyDTO {

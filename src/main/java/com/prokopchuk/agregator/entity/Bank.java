@@ -10,6 +10,11 @@ import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Bank entity
+ *
+ * @author N.Prokopchuk
+ */
 @JsonIgnoreProperties(ignoreUnknown=true)
 @EqualsAndHashCode(callSuper = true, exclude = "rates")
 @Entity
