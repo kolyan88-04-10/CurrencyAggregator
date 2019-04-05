@@ -14,32 +14,21 @@
     <a class="btn btn-success" href="#" th:href="@{/edit-rates.html}"> Add Books </a>
     <a class="btn btn-primary" href="#" th:href="@{/templates/delete-rate.html}" th:classappend="${rates.empty} ? 'disabled' : ''"> Edit Books </a>
     </div>
-    <form action="#" th:action="@{/CurrencyAggregator/show}" th:object="${form}" method="post">
-        <!--<p>Currency: <input type="text" th:field="*{name}" /></p>-->
+    <form action="#" th:action="@{/CurrencyAggregator/delete}" th:object="${form}" th:method="delete">
         <p>Currency:
             <select th:field="*{name}">
                 <option th:each="currency : ${currencies}" th:value="${currency.name}" th:text="${currency.name}">
                 </option>
             </select>
         </p>
-        <p>Transaction type:
-            <select th:field="*{isBuying}">
-            <option th:value="${true}" th:text="BUYING"></option>
-            <option th:value="${false}" th:text="SELLING"></option>
-            </select>
-        </p>
-        <p>
-            Sorting:
-            <select th:field="*{isAscending}">
-                <option th:value="${true}" th:text="ASCENDING"></option>
-                <option th:value="${false}" th:text="DESCENDING"}>>
+        <p>Bank:
+            <select th:field="*{bank}">
+                <option th:each="bank : ${banks}" th:value="${bank.name}" th:text="${bank.name}">
                 </option>
             </select>
         </p>
         <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
     </form>
-
-    </div>
 </div>
 </body>
 </html>

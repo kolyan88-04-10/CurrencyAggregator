@@ -9,7 +9,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.prokopchuk.agregator.dto.CurrencyDTO;
 import com.prokopchuk.agregator.support.StaticMessages;
-import com.prokopchuk.agregator.support.WrongIncomingDataExeption;
+import com.prokopchuk.agregator.support.WrongIncomingDataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,13 +24,13 @@ public class FileServiceImpl implements FileService {
     private final SimpleModule module = new SimpleModule();
     private final CsvSchema schema = CsvSchema.emptySchema().withHeader();
     @Autowired
-    private BankService bankService;
+    private ExchengeRatesService exchengeRatesService;
 
     private enum Extension {CSV, JSON, XML}
 
     @Override
     public List<CurrencyDTO> processData(MultipartFile file)
-            throws WrongIncomingDataExeption {
+            throws WrongIncomingDataException {
         String[] fileNameSections;
         String bankName;
         String format;
@@ -42,7 +42,7 @@ public class FileServiceImpl implements FileService {
             format = fileNameSections[fileNameSections.length - 1].toUpperCase();
             extension = Extension.valueOf(format);
         } catch (RuntimeException e) {
-            throw new WrongIncomingDataExeption(StaticMessages.UNKNOWN_ERROR + e.getLocalizedMessage());
+            throw new WrongIncomingDataException(StaticMessages.UNKNOWN_ERROR + e.getLocalizedMessage());
         }
 
         List<CurrencyDTO> valueList;
@@ -64,16 +64,16 @@ public class FileServiceImpl implements FileService {
                             xml, new TypeReference<List<CurrencyDTO>>(){});
                     break;
                 default:
-                    throw new WrongIncomingDataExeption(StaticMessages.UNKNOWN_FORMAT + format);
+                    throw new WrongIncomingDataException(StaticMessages.UNKNOWN_FORMAT + format);
             }
         } catch (IOException e) {
-            throw new WrongIncomingDataExeption(StaticMessages.UNKNOWN_ERROR + e.getLocalizedMessage());
+            throw new WrongIncomingDataException(StaticMessages.UNKNOWN_ERROR + e.getLocalizedMessage());
         }
 
         List<CurrencyDTO> result = new ArrayList<>();
         for (CurrencyDTO current : valueList) {
             current.setBank(bankName);
-            result.add(bankService.persistCurrency(current));
+            result.add(exchengeRatesService.persistCurrency(current));
         }
         return result;
     }

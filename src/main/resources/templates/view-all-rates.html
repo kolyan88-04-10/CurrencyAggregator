@@ -11,44 +11,14 @@
         </div>
     </div>
     <div class="col-md-6">
-    <a class="btn btn-success" href="#" th:href="@{/CurrencyAggregator/create}"> Edit rates </a>
-    <a class="btn btn-primary" href="#" th:href="@{delete-rates.html}" th:classappend="${rates.empty} ? 'disabled' : ''"> Delete rates </a>
+        <a class="btn btn-success" href="#" th:href="@{/CurrencyAggregator/select}">
+            Select currency
+        </a>
+    <a class="btn btn-success" href="#" th:href="@{/CurrencyAggregator/create}">
+        Edit rates
+    </a>
+    <a class="btn btn-primary" href="#" th:href="@{/CurrencyAggregator/delete}" th:classappend="${rates.empty} ? 'disabled' : ''"> Delete rates </a>
     </div>
-    <form action="#" th:action="@{CurrencyAggregator/rates/{currency}/{isBuying}/{ascendByPrice}}" th:object="${form}"
-          method="get">
-        <fieldset>
-            <input type="submit" id="submitButton" th:value="Save">
-            <input type="reset" id="resetButton" name="reset" th:value="Reset"/>
-            <table>
-                <thead>
-                <tr>
-                    <th> Currency </th>
-                    <th> Transaction type</th>
-                    <th> Sort </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                    </td>
-                    <!--<td>-->
-                        <!--<select th:field="*{isBuying}">-->
-                        <!--<option th:value="true" th:text="Buying"></option>-->
-                        <!--<option th:value="false" th:text="Selling"></option>-->
-                        <!--</select>-->
-                    <!--</td>-->
-                    <!--<td>-->
-                        <!--<select th:field="*{ascendByPrice}">-->
-                            <!--<option th:value="true" th:text="Ascending"></option>-->
-                            <!--<option th:value="false" th:text="Descending"></option>-->
-                        <!--</select>-->
-                    <!--</td>-->
-                </tr>
-                </tbody>
-            </table>
-        </fieldset>
-    </form>
-
     <div class="row">
         <div class="col-md-6">
             <table class="table">
