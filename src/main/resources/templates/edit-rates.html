@@ -17,8 +17,8 @@
         <a class="btn btn-success" href="#" th:href="@{/CurrencyAggregator/select}">
         Select currency
     </a>
-    <a class="btn btn-primary" href="#" th:href="@{/templates/delete-rates.html}" th:classappend="${rates.empty} ? 'disabled' : ''">
-        Edit currency rates
+    <a class="btn btn-primary" href="#" th:href="@{/CurrencyAggregator/delete}" th:classappend="${rates.empty} ? 'disabled' : ''">
+        Delete currency rates
     </a>
     </div>
     <form action="#" th:action="@{/CurrencyAggregator/create}" th:object="${form}" method="post">

@@ -55,13 +55,9 @@ public class ExchangeRatesController {
 
     @PostMapping("/CurrencyAggregator/create")
     public String saveCurrency (Model model,
-                                @ModelAttribute CurrencyDTO currencyDTO) {
+                                @ModelAttribute CurrencyDTO currencyDTO) throws WrongIncomingDataException {
 
-        try {
-            exchangeRatesService.persistCurrency(currencyDTO);
-        } catch (WrongIncomingDataException wrongIncomingDataException) {
-            return "error-page";
-        }
+        exchangeRatesService.persistCurrency(currencyDTO);
         List<CurrencyDTO> rates = exchangeRatesService.getAllExchangeRates();
         model.addAttribute("rates", rates);
         model.addAttribute("message", StaticMessages.EXCHANGE_RATE_MODIFIED_MESSAGE);
@@ -104,17 +100,13 @@ public class ExchangeRatesController {
 
     @PostMapping("/CurrencyAggregator/show")
     public String showSpecifiedCurrency (Model model,
-                                         @ModelAttribute SelectCurrencyDTO selectCurrencyDTO) {
-        try {
-            String currencyName = selectCurrencyDTO.getName();
-            boolean isBuying = selectCurrencyDTO.getIsBuying();
-            boolean isAscending = selectCurrencyDTO.getIsAscending();
-            List<CurrencyDTO> resultList =  exchangeRatesService.getSpecificCurrency(
-                    currencyName, isBuying, isAscending);
-            model.addAttribute("rates", resultList);
-        } catch (WrongIncomingDataException wrongIncomingDataException) {
-            return "error-page";
-        }
+                                         @ModelAttribute SelectCurrencyDTO selectCurrencyDTO) throws WrongIncomingDataException {
+        String currencyName = selectCurrencyDTO.getName();
+        boolean isBuying = selectCurrencyDTO.getIsBuying();
+        boolean isAscending = selectCurrencyDTO.getIsAscending();
+        List<CurrencyDTO> resultList =  exchangeRatesService.getSpecificCurrency(
+                currencyName, isBuying, isAscending);
+        model.addAttribute("rates", resultList);
         return "view-rates";
     }
 }
