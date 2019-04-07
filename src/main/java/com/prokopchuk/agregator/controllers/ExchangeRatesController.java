@@ -12,8 +12,12 @@ import com.prokopchuk.agregator.support.StaticMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import javax.cache.annotation.CacheResult;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -22,14 +26,19 @@ import java.util.List;
  * @author N.Prokopchuk
  */
 
-@Controller("CurrencyAggregator/rates")
-public class ExchangeRatesController {
+@Controller
+public class ExchangeRatesController implements WebMvcConfigurer {
     @Autowired
     private ExchangeRatesService exchangeRatesService;
     @Autowired
     private BankService bankService;
     @Autowired
     private CurrencyService currencyService;
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/view-inform").setViewName("view-inform");
+    }
 
     @GetMapping(path = "CurrencyAggregator/start")
     public String startApplication() {
@@ -48,20 +57,24 @@ public class ExchangeRatesController {
     public String showCreateCurrencyForm(Model model) {
         List<CurrencyDTO> rates = exchangeRatesService.getAllExchangeRates();
         CurrencyDTO currencyForm = new CurrencyDTO();
-        model.addAttribute("form", currencyForm);
+        model.addAttribute("currencyDTO", currencyForm);
         model.addAttribute("rates", rates);
         return "edit-rates";
     }
 
     @PostMapping("/CurrencyAggregator/create")
-    public String saveCurrency (Model model,
-                                @ModelAttribute CurrencyDTO currencyDTO) throws WrongIncomingDataException {
-
-        exchangeRatesService.persistCurrency(currencyDTO);
+    public String saveCurrency (
+            Model model, @Valid @ModelAttribute CurrencyDTO currencyDTO,
+            BindingResult bindingResult) throws WrongIncomingDataException {
         List<CurrencyDTO> rates = exchangeRatesService.getAllExchangeRates();
         model.addAttribute("rates", rates);
-        model.addAttribute("message", StaticMessages.EXCHANGE_RATE_MODIFIED_MESSAGE);
-        return "view-inform";
+        if (bindingResult.hasErrors()) {
+            return "edit-rates";
+        }
+        exchangeRatesService.persistCurrency(currencyDTO);
+        model.addAttribute("message",
+                StaticMessages.EXCHANGE_RATE_MODIFIED_MESSAGE);
+        return "redirect:/view-inform";
     }
 
     @GetMapping("CurrencyAggregator/delete")
@@ -99,8 +112,9 @@ public class ExchangeRatesController {
     }
 
     @PostMapping("/CurrencyAggregator/show")
-    public String showSpecifiedCurrency (Model model,
-                                         @ModelAttribute SelectCurrencyDTO selectCurrencyDTO) throws WrongIncomingDataException {
+    public String showSpecifiedCurrency (
+            Model model, @ModelAttribute SelectCurrencyDTO selectCurrencyDTO)
+            throws WrongIncomingDataException {
         String currencyName = selectCurrencyDTO.getName();
         boolean isBuying = selectCurrencyDTO.getIsBuying();
         boolean isAscending = selectCurrencyDTO.getIsAscending();

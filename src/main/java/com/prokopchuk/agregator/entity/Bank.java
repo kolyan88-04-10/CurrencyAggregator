@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import java.util.List;
 @Entity
 @Getter @Setter
 public class Bank extends AbstractEntity<Integer> {
+    @NotBlank(message = "Bank name is mandatory")
     private String name;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL,

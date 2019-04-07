@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import java.util.List;
 @Getter @Setter
 public class Currency extends AbstractEntity<Integer> {
     @Column(unique = true)
+    @NotBlank(message = "Currency name is mandatory")
     private String name;
     @Column(name="order_sequence")
     private Integer order;

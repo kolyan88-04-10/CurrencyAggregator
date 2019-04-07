@@ -21,25 +21,63 @@
         Delete currency rates
     </a>
     </div>
-    <form action="#" th:action="@{/CurrencyAggregator/create}" th:object="${form}" method="post">
-        <p>Currency: <input type="text" th:field="*{name}" /></p>
-        <p>Bank: <input type="text" th:field="*{bank}" /></p>
-        <p>Rate: <input type="text" th:field="*{value}" /></p>
-        <p>Transaction type:
-            <select th:field="*{transactionType}">
-            <option th:value="BUYING" th:text="BUYING"></option>
-            <option th:value="SELLING" th:text="SELLING"></option>
-            </select>
-        </p>
-        <p>Operation allowed:
-            <select th:field="*{allowed}">
-                <option th:value="true" th:text="Allowed"></option>
-                <option th:value="false" th:text="NotAllowed"></option>
-            </select>
-        </p>
-        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+    <form action="#" th:action="@{/CurrencyAggregator/create}" th:object="${currencyDTO}" method="post">
+        <table>
+            <tr>
+                <td>Currency:</td>
+                <td><input type="text" th:field="*{name}" /></td>
+                <td th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</td>
+            </tr>
+            <tr>
+                <td>Bank:</td>
+                <td><input type="text" th:field="*{bank}" /></td>
+                <td th:if="${#fields.hasErrors('bank')}" th:errors="*{bank}">Bank Error</td>
+            </tr>
+            <tr>
+                <td>Rate:</td>
+                <td><input type="text" th:field="*{value}" /></td>
+                <td th:if="${#fields.hasErrors('value')}" th:errors="*{value}">Rate Error</td>
+            </tr>
+            <tr>
+                <td>Transaction type:</td>
+                <td>
+                    <select th:field="*{transactionType}">
+                        <option th:value="BUYING" th:text="BUYING"></option>
+                        <option th:value="SELLING" th:text="SELLING"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Operation allowed:</td>
+                <td>
+                    <select th:field="*{allowed}">
+                        <option th:value="true" th:text="Allowed"></option>
+                        <option th:value="false" th:text="NotAllowed"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="submit" value="Submit" /></td>
+                <td><input type="reset" value="Reset" /></td>
+            </tr>
+        </table>
+        <!--<p>Currency: <input type="text" th:field="*{name}" /></p>-->
+        <!--<p>Bank: <input type="text" th:field="*{bank}" /></p>-->
+        <!--<p>Rate: <input type="text" th:field="*{value}" /></p>-->
+        <!--<p>Transaction type:-->
+            <!--<select th:field="*{transactionType}">-->
+            <!--<option th:value="BUYING" th:text="BUYING"></option>-->
+            <!--<option th:value="SELLING" th:text="SELLING"></option>-->
+            <!--</select>-->
+        <!--</p>-->
+        <!--<p>Operation allowed:-->
+            <!--<select th:field="*{allowed}">-->
+                <!--<option th:value="true" th:text="Allowed"></option>-->
+                <!--<option th:value="false" th:text="NotAllowed"></option>-->
+            <!--</select>-->
+        <!--</p>-->
+        <!--<p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>-->
     </form>
-
     </div>
 </div>
 </body>
